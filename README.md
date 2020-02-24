@@ -5,6 +5,12 @@ Its essential to keep the code clean. Through generic repository pattern we can 
 
 ## Documentation URL
 
+* Covered Topics
+  * ASP.NET CORE
+  * DB First Approach
+  * Generic Repository Pattern 
+  
+
 Please click the below link to get the full documentation. 
 [CRUD_using_DOT_NET_CORE_GENERIC_LAYER_BASED_Full_Documentation](CRUD_using_DOT_NET_CORE_GENERIC_LAYER_BASED_Full_Documentation.pdf)
 
