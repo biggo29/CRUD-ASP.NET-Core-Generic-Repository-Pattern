@@ -2,11 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CRUD.Database;
+using CRUD.Database.Context;
+using CRUD.Database.UnitOfWork;
+using CRUD.Service;
+using CRUD.Service.Implementation;
+using CRUD.Service.Interface;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 
 namespace CRUD_DOTNET_CORE_GENERIC
@@ -24,6 +33,22 @@ namespace CRUD_DOTNET_CORE_GENERIC
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            services.AddDbContext<TESTContext>(options => options.UseSqlServer(Configuration["SqlOption:ConnectionString"]));
+
+            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton<AppSettings>();
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+
+            services.AddTransient<IEmployeeService, EmployeeService>();
+            services.AddTransient<IDepartmentService, DepartmentService>();
+
+            //Add HttpContextAccessor
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //Getting Connection string from appsettings.json
+            var section = Configuration.GetSection("SqlOption");
+            //passing the connection through service
+            services.Configure<SqlOption>(section);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +68,8 @@ namespace CRUD_DOTNET_CORE_GENERIC
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            //app.UseMvc();
 
             app.UseAuthorization();
 

@@ -9,18 +9,19 @@ namespace CRUD.Database.Context
     public partial class TESTContext : DbContext
     {
         private SqlOption _connectionString;
-        public TESTContext()
-        {
-        }
+        //public TESTContext()
+        //{
+        //}
 
         public TESTContext(IOptions<SqlOption> connectionString)
         {
             this._connectionString = connectionString.Value;
         }
 
-        public TESTContext(DbContextOptions<TESTContext> options)
+        public TESTContext(DbContextOptions<TESTContext> options, IOptions<SqlOption> connectionString)
             : base(options)
         {
+            this._connectionString = connectionString.Value;
         }
 
         public virtual DbSet<Department> Department { get; set; }
