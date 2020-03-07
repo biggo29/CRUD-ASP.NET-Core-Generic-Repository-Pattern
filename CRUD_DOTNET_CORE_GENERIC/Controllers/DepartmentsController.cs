@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CRUD.Database.Context;
 using CRUD.Database.Models;
+using CRUD.Service.Interface;
 
 namespace CRUD_DOTNET_CORE_GENERIC.Controllers
 {
     public class DepartmentsController : Controller
     {
         private readonly TESTContext _context;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentsController(TESTContext context)
+        public DepartmentsController(TESTContext context, IDepartmentService departmentService)
         {
             _context = context;
+            _departmentService = departmentService;
         }
 
         // GET: Departments
@@ -26,13 +29,13 @@ namespace CRUD_DOTNET_CORE_GENERIC.Controllers
         }
 
         // GET: Departments/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
-
+            Department dept = _departmentService.GetDepartmentId(id);
             var department = await _context.Department
                 .FirstOrDefaultAsync(m => m.DeptId == id);
             if (department == null)
@@ -40,7 +43,7 @@ namespace CRUD_DOTNET_CORE_GENERIC.Controllers
                 return NotFound();
             }
 
-            return View(department);
+            return View(dept);
         }
 
         // GET: Departments/Create
