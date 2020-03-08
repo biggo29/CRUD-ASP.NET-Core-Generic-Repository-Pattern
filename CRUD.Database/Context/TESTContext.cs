@@ -57,6 +57,12 @@ namespace CRUD.Database.Context
                 entity.Property(e => e.EmpName)
                     .IsRequired()
                     .HasMaxLength(50);
+
+                entity.HasOne(d => d.Dept)
+                    .WithMany(p => p.Employee)
+                    .HasForeignKey(d => d.DeptId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_Employee_Department");
             });
 
             OnModelCreatingPartial(modelBuilder);
