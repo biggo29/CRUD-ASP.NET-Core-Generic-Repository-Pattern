@@ -7,22 +7,33 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CRUD.Database.Context;
 using CRUD.Database.Models;
+using CRUD.Database.UnitOfWork;
+using CRUD.Service.Interface;
 
 namespace CRUD_DOTNET_CORE_GENERIC.Controllers
 {
     public class DepartmentsController : Controller
     {
         private readonly TESTContext _context;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentsController(TESTContext context)
+        public DepartmentsController(TESTContext context, IUnitOfWork unitOfWork, IDepartmentService departmentService)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
+            _departmentService = departmentService;
         }
 
         // GET: Departments
-        public async Task<IActionResult> Index()
+        //public async Task<IActionResult> Index()
+        //{
+        //    return View(await _context.Department.ToListAsync());
+        //}
+
+            public ActionResult Index()
         {
-            return View(await _context.Department.ToListAsync());
+            return View(_unitOfWork.Repository<Department>().GetAll());
         }
 
         // GET: Departments/Details/5

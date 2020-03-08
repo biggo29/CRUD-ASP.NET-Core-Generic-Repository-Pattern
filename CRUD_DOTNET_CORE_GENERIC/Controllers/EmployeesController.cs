@@ -7,16 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CRUD.Database.Context;
 using CRUD.Database.Models;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using CRUD.Service.Interface;
+using CRUD.Database.UnitOfWork;
 
 namespace CRUD_DOTNET_CORE_GENERIC.Controllers
 {
     public class EmployeesController : Controller
     {
         private readonly TESTContext _context;
+        private readonly IEmployeeService _employeeService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EmployeesController(TESTContext context)
+        public EmployeesController(TESTContext context, IUnitOfWork unitOfWork)
         {
             _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Employees
@@ -57,14 +64,48 @@ namespace CRUD_DOTNET_CORE_GENERIC.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("EmpId,EmpName,EmpAge,EmpGender,DeptId,EmpEmail,EmpPhoto")] Employee employee)
+        //public async Task<IActionResult> Create([Bind("EmpId,EmpName,EmpAge,EmpGender,DeptId,EmpEmail,EmpPhoto")] Employee employee)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _context.Add(employee);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    ViewData["DeptId"] = new SelectList(_context.Department, "DeptId", "DeptName", employee.DeptId);
+        //    return View(employee);
+        //}
+
+            [HttpPost]
+            public ActionResult Create(Employee employee)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(employee);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            //if(ModelState.IsValid)
+            //{
+            //var image = Request.Files["EmpPhoto"];
+            var image = Request.Form.Files["EmpPhoto"];
+            var files = HttpContext.Request.Form.Files;
+                foreach (var Image in files)
+                {
+                    if (Image != null && Image.Length > 0)
+                    {
+                        var file = Image;
+                        //var uploads = Path.Combine(_appEnvironment.WebRootPath, "upload\\img");
+                        if (file.Length > 0)
+                        {
+                            //var fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(file.FileName);
+                            using (var fileStream = new MemoryStream())
+                            {
+                                file.CopyTo(fileStream);
+                                var fileBytes = fileStream.ToArray();
+                                //byte[] imageInByte = Convert.ToBase64String(fileBytes);
+                                employee.EmpPhoto = fileBytes;
+                            }
+                        }
+                    }
+                //}
             }
+            _unitOfWork.Repository<Employee>().Insert(employee);
+            _unitOfWork.Save();
             ViewData["DeptId"] = new SelectList(_context.Department, "DeptId", "DeptName", employee.DeptId);
             return View(employee);
         }
