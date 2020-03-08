@@ -12,5 +12,6 @@ namespace CRUD.Database.Models
         public int DeptId { get; set; }
         public string EmpEmail { get; set; }
         public byte[] EmpPhoto { get; set; }
+        public virtual ICollection<Department> Departments { get; set; }
     }
 }
